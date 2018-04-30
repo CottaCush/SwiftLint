@@ -34,7 +34,7 @@ public struct IdentifierNameRule: ASTRule, ConfigurationProviderRule {
 
     public func validate(file: File, kind: SwiftDeclarationKind,
                          dictionary: [String: SourceKitRepresentable]) -> [StyleViolation] {
-        guard !dictionary.enclosedSwiftAttributes.contains("source.decl.attribute.override") else {
+        guard !dictionary.enclosedSwiftAttributes.contains(.override) else {
             return []
         }
 
@@ -49,7 +49,7 @@ public struct IdentifierNameRule: ASTRule, ConfigurationProviderRule {
             let type = self.type(for: kind)
             if !isFunction {
                 let allowedSymbols = configuration.allowedSymbols.union(.alphanumerics)
-                if !allowedSymbols.isSuperset(of: CharacterSet(charactersIn: name)) {
+                if !allowedSymbols.isSuperset(of: CharacterSet(safeCharactersIn: name)) {
                     return [
                         StyleViolation(ruleDescription: description,
                                        severity: .error,

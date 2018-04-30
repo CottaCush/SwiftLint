@@ -72,20 +72,29 @@ extension Dictionary where Key: ExpressibleByStringLiteral {
         return (self["key.usr"] as? Int64).flatMap({ Int($0) })
     }
 
-    var enclosedSwiftAttributes: [String] {
+    var attribute: String? {
+        return self["key.attribute"] as? String
+    }
+
+    var enclosedSwiftAttributes: [SwiftDeclarationAttributeKind] {
+        return swiftAttributes.compactMap { $0.attribute }
+                              .compactMap(SwiftDeclarationAttributeKind.init(rawValue:))
+    }
+
+    var swiftAttributes: [[String: SourceKitRepresentable]] {
         let array = self["key.attributes"] as? [SourceKitRepresentable] ?? []
-        let dictionaries = array.flatMap { ($0 as? [String: SourceKitRepresentable]) }
-        return dictionaries.flatMap { $0["key.attribute"] as? String }
+        let dictionaries = array.compactMap { ($0 as? [String: SourceKitRepresentable]) }
+        return dictionaries
     }
 
     var substructure: [[String: SourceKitRepresentable]] {
         let substructure = self["key.substructure"] as? [SourceKitRepresentable] ?? []
-        return substructure.flatMap { $0 as? [String: SourceKitRepresentable] }
+        return substructure.compactMap { $0 as? [String: SourceKitRepresentable] }
     }
 
     var elements: [[String: SourceKitRepresentable]] {
         let elements = self["key.elements"] as? [SourceKitRepresentable] ?? []
-        return elements.flatMap { $0 as? [String: SourceKitRepresentable] }
+        return elements.compactMap { $0 as? [String: SourceKitRepresentable] }
     }
 
     var enclosedVarParameters: [[String: SourceKitRepresentable]] {
@@ -117,7 +126,7 @@ extension Dictionary where Key: ExpressibleByStringLiteral {
 
     var inheritedTypes: [String] {
         let array = self["key.inheritedtypes"] as? [SourceKitRepresentable] ?? []
-        return array.flatMap { ($0 as? [String: String])?.name }
+        return array.compactMap { ($0 as? [String: String])?.name }
     }
 
     internal func extractCallsToSuper(methodName: String) -> [String] {

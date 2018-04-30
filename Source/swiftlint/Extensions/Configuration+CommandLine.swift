@@ -34,7 +34,7 @@ private func scriptInputFiles() -> Result<[File], CommandantError<()>> {
     }()
 
     return count.flatMap { count in
-        let inputFiles = (0..<count).flatMap { fileNumber -> File? in
+        let inputFiles = (0..<count).compactMap { fileNumber -> File? in
             switch getEnvironmentVariable("SCRIPT_INPUT_FILE_\(fileNumber)") {
             case let .success(path):
                 if path.bridge().isSwiftFile() {
@@ -57,10 +57,10 @@ private func autoreleasepool(block: () -> Void) { block() }
 extension Configuration {
 
     func visitLintableFiles(path: String, action: String, useSTDIN: Bool = false,
-                            quiet: Bool = false, useScriptInputFiles: Bool,
+                            quiet: Bool = false, useScriptInputFiles: Bool, forceExclude: Bool,
                             cache: LinterCache? = nil, parallel: Bool = false,
                             visitorBlock: @escaping (Linter) -> Void) -> Result<[File], CommandantError<()>> {
-        return getFiles(path: path, action: action, useSTDIN: useSTDIN, quiet: quiet,
+        return getFiles(path: path, action: action, useSTDIN: useSTDIN, quiet: quiet, forceExclude: forceExclude,
                         useScriptInputFiles: useScriptInputFiles)
         .flatMap { files -> Result<[Configuration: [File]], CommandantError<()>> in
             if files.isEmpty {
@@ -108,11 +108,12 @@ extension Configuration {
             } else {
                 filesAndConfigurations.forEach(visit)
             }
-            return .success(filesAndConfigurations.flatMap({ $0.0 }))
+            return .success(filesAndConfigurations.compactMap({ $0.0 }))
         }
     }
 
-    fileprivate func getFiles(path: String, action: String, useSTDIN: Bool, quiet: Bool,
+    // swiftlint:disable function_parameter_count
+    fileprivate func getFiles(path: String, action: String, useSTDIN: Bool, quiet: Bool, forceExclude: Bool,
                               useScriptInputFiles: Bool) -> Result<[File], CommandantError<()>> {
         if useSTDIN {
             let stdinData = FileHandle.standardInput.readDataToEndOfFile()
@@ -127,8 +128,9 @@ extension Configuration {
             let message = "\(action) Swift files " + (path.isEmpty ? "in current working directory" : "at path \(path)")
             queuedPrintError(message)
         }
-        return .success(lintableFiles(inPath: path))
+        return .success(lintableFiles(inPath: path, forceExclude: forceExclude))
     }
+    // swiftlint:enable function_parameter_count
 
     // MARK: Lint Command
 
@@ -144,7 +146,8 @@ extension Configuration {
                             visitorBlock: @escaping (Linter) -> Void) -> Result<[File], CommandantError<()>> {
         return visitLintableFiles(path: options.path, action: "Linting", useSTDIN: options.useSTDIN,
                                   quiet: options.quiet, useScriptInputFiles: options.useScriptInputFiles,
-                                  cache: cache, parallel: true, visitorBlock: visitorBlock)
+                                  forceExclude: options.forceExclude, cache: cache, parallel: true,
+                                  visitorBlock: visitorBlock)
     }
 
     // MARK: AutoCorrect Command

@@ -72,7 +72,7 @@ public struct RedundantOptionalInitializationRule: ASTRule, CorrectableRule, Con
             dictionary.setterAccessibility != nil,
             let type = dictionary.typeName,
             typeIsOptional(type),
-            !dictionary.enclosedSwiftAttributes.contains("source.decl.attribute.lazy"),
+            !dictionary.enclosedSwiftAttributes.contains(.lazy),
             let range = range(for: dictionary, file: file),
             let match = file.match(pattern: pattern, with: [.keyword], range: range).first,
             match.location == range.location + range.length - match.length else {
@@ -98,12 +98,12 @@ public struct RedundantOptionalInitializationRule: ASTRule, CorrectableRule, Con
 
     private func violationRanges(in file: File, dictionary: [String: SourceKitRepresentable]) -> [NSRange] {
         return dictionary.substructure.flatMap { subDict -> [NSRange] in
-            guard let kindString = subDict.kind,
-                let kind = SwiftDeclarationKind(rawValue: kindString) else {
-                    return []
+            var ranges = violationRanges(in: file, dictionary: subDict)
+            if let kind = subDict.kind.flatMap(SwiftDeclarationKind.init(rawValue:)) {
+                ranges += violationRanges(in: file, kind: kind, dictionary: subDict)
             }
-            return violationRanges(in: file, dictionary: subDict) +
-                violationRanges(in: file, kind: kind, dictionary: subDict)
+
+            return ranges
         }
     }
 

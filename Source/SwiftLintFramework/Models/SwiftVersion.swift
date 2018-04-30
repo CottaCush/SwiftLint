@@ -9,24 +9,24 @@
 import Foundation
 import SourceKittenFramework
 
-struct SwiftVersion: RawRepresentable {
-    typealias RawValue = String
+public struct SwiftVersion: RawRepresentable {
+    public typealias RawValue = String
 
-    let rawValue: String
+    public let rawValue: String
 
-    init(rawValue: String) {
+    public init(rawValue: String) {
         self.rawValue = rawValue
     }
 }
 
 extension SwiftVersion: Comparable {
     // Comparable
-    static func < (lhs: SwiftVersion, rhs: SwiftVersion) -> Bool {
+    public static func < (lhs: SwiftVersion, rhs: SwiftVersion) -> Bool {
         return lhs.rawValue < rhs.rawValue
     }
 }
 
-extension SwiftVersion {
+public extension SwiftVersion {
     static let three = SwiftVersion(rawValue: "3.0.0")
     static let four = SwiftVersion(rawValue: "4.0.0")
     static let fourDotOne = SwiftVersion(rawValue: "4.1.0")
@@ -43,7 +43,11 @@ extension SwiftVersion {
         }
 
         let file = File(contents: """
-            #if swift(>=4.1.0)
+            #if swift(>=4.2.0)
+                let version = "4.2.0"
+            #elseif swift(>=4.1.1)
+                let version = "4.1.1"
+            #elseif swift(>=4.1.0)
                 let version = "4.1.0"
             #elseif swift(>=4.0.3)
                 let version = "4.0.3"
@@ -53,6 +57,12 @@ extension SwiftVersion {
                 let version = "4.0.1"
             #elseif swift(>=4.0.0)
                 let version = "4.0.0"
+            #elseif swift(>=3.4.0)
+                let version = "3.4.0"
+            #elseif swift(>=3.3.1)
+                let version = "3.3.1"
+            #elseif swift(>=3.3.0)
+                let version = "3.3.0"
             #elseif swift(>=3.2.3)
                 let version = "3.2.3"
             #elseif swift(>=3.2.2)

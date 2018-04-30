@@ -17,7 +17,7 @@ public struct ArrayInitRule: ASTRule, ConfigurationProviderRule, OptInRule {
     public static let description = RuleDescription(
         identifier: "array_init",
         name: "Array Init",
-        description: "Prefer using Array(seq) than seq.map { $0 } to convert a sequence into an Array.",
+        description: "Prefer using `Array(seq)` over `seq.map { $0 }` to convert a sequence into an Array.",
         kind: .lint,
         nonTriggeringExamples: [
             "Array(foo)\n",
@@ -135,7 +135,7 @@ public struct ArrayInitRule: ASTRule, ConfigurationProviderRule, OptInRule {
     }
 
     private func isShortParameterStyleViolation(file: File, tokens: [SyntaxToken]) -> Bool {
-        let kinds = tokens.flatMap { SyntaxKind(rawValue: $0.type) }
+        let kinds = tokens.compactMap { SyntaxKind(rawValue: $0.type) }
         switch kinds {
         case [.identifier]:
             let identifier = file.contents(for: tokens[0])
@@ -165,7 +165,7 @@ public struct ArrayInitRule: ASTRule, ConfigurationProviderRule, OptInRule {
             return !isKeyword || file.contents(for: token) != "in"
         })
 
-        let kinds = tokens.flatMap { SyntaxKind(rawValue: $0.type) }
+        let kinds = tokens.compactMap { SyntaxKind(rawValue: $0.type) }
         switch kinds {
         case [.keyword, .identifier]:
             let keyword = file.contents(for: tokens[0])

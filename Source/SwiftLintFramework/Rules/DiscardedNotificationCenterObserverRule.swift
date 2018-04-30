@@ -51,7 +51,7 @@ public struct DiscardedNotificationCenterObserverRule: ASTRule, ConfigurationPro
             let name = dictionary.name,
             name.hasSuffix(".addObserver"),
             case let arguments = dictionary.enclosedArguments,
-            case let argumentsNames = arguments.flatMap({ $0.name }),
+            case let argumentsNames = arguments.compactMap({ $0.name }),
             argumentsNames == ["forName", "object", "queue"] ||
                 argumentsNames == ["forName", "object", "queue", "using"],
             let offset = dictionary.offset,
@@ -67,7 +67,7 @@ public struct DiscardedNotificationCenterObserverRule: ASTRule, ConfigurationPro
         if let lastMatch = file.match(pattern: "\\breturn\\s+", with: [.keyword], range: range).last,
             lastMatch.location == range.length - lastMatch.length,
             let lastFunction = file.structure.functions(forByteOffset: offset).last,
-            !lastFunction.enclosedSwiftAttributes.contains("source.decl.attribute.discardableResult") {
+            !lastFunction.enclosedSwiftAttributes.contains(.discardableResult) {
             return []
         }
 

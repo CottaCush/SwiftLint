@@ -78,6 +78,10 @@ class RulesTests: XCTestCase {
         verifyRule(DiscouragedOptionalBooleanRule.description)
     }
 
+    func testDiscouragedOptionalCollection() {
+        verifyRule(DiscouragedOptionalCollectionRule.description)
+    }
+
     func testDynamicInline() {
         verifyRule(DynamicInlineRule.description)
     }
@@ -94,8 +98,16 @@ class RulesTests: XCTestCase {
         verifyRule(EmptyParametersRule.description)
     }
 
+    func testLowerACLThanParent() {
+        verifyRule(LowerACLThanParentRule.description)
+    }
+
     func testEmptyParenthesesWithTrailingClosure() {
         verifyRule(EmptyParenthesesWithTrailingClosureRule.description)
+    }
+
+    func testEmptyString() {
+        verifyRule(EmptyStringRule.description)
     }
 
     func testExplicitACL() {
@@ -318,6 +330,10 @@ class RulesTests: XCTestCase {
         verifyRule(RedundantOptionalInitializationRule.description)
     }
 
+    func testRedundantSetAccessControl() {
+        verifyRule(RedundantSetAccessControlRule.description)
+    }
+
     func testRedundantStringEnumValue() {
         verifyRule(RedundantStringEnumValueRule.description)
     }
@@ -417,12 +433,20 @@ class RulesTests: XCTestCase {
         verifyRule(TypeBodyLengthRule.description)
     }
 
+    func testUnavailableFunction() {
+        verifyRule(UnavailableFunctionRule.description)
+    }
+
     func testUnneededBreakInSwitch() {
         verifyRule(UnneededBreakInSwitchRule.description)
     }
 
     func testUnneededParenthesesInClosureArgument() {
         verifyRule(UnneededParenthesesInClosureArgumentRule.description)
+    }
+
+    func testUntypedErrorInCatch() {
+        verifyRule(UntypedErrorInCatchRule.description)
     }
 
     func testUnusedClosureParameter() {

@@ -97,7 +97,7 @@ Alternatively, if you've installed SwiftLint via CocoaPods the script should loo
 To run `swiftlint autocorrect` on save in Xcode, install the
 [SwiftLintXcode](https://github.com/ypresto/SwiftLintXcode) plugin from Alcatraz.
 
-⚠ ️This plugin will not work with Xcode 8 or later without disabling SIP.
+⚠️This plugin will not work with Xcode 8 or later without disabling SIP.
 This is not recommended.
 
 ### AppCode
@@ -119,12 +119,19 @@ You can use the [official swiftlint fastlane action](https://docs.fastlane.tools
 
 ```ruby
 swiftlint(
-  mode: :lint,                            # SwiftLint mode: :lint (default) or :autocorrect
-  executable: "Pods/SwiftLint/swiftlint", # The SwiftLint binary path (optional). Important if you've installed it via CocoaPods
-  output_file: "swiftlint.result.json",   # The path of the output file (optional)
-  reporter: "json",                       # The custom reporter to use (optional)
-  config_file: ".swiftlint-ci.yml",       # The path of the configuration file (optional)
-  ignore_exit_status: true                # Allow fastlane to continue even if SwiftLint returns a non-zero exit status
+    mode: :lint,                            # SwiftLint mode: :lint (default) or :autocorrect
+    executable: "Pods/SwiftLint/swiftlint", # The SwiftLint binary path (optional). Important if you've installed it via CocoaPods
+    path: "/path/to/lint",                  # Specify path to lint (optional)
+    output_file: "swiftlint.result.json",   # The path of the output file (optional)
+    reporter: "json",                       # The custom reporter to use (optional)
+    config_file: ".swiftlint-ci.yml",       # The path of the configuration file (optional)
+    files: [                                # List of files to process (optional)
+        "AppDelegate.swift",
+        "path/to/project/Model.swift"
+    ],
+    ignore_exit_status: true,               # Allow fastlane to continue even if SwiftLint returns a non-zero exit status (Default: false)
+    quiet: true,                            # Don't print status logs like 'Linting ' & 'Done linting' (Default: false)
+    strict: true                            # Fail on warnings? (Default: false)
 )
 ```
 
@@ -248,6 +255,22 @@ For example:
 let noWarning :String = "" // No warning about colons immediately after variable names!
 // swiftlint:enable colon
 let hasWarning :String = "" // Warning generated about colons immediately after variable names
+```
+
+Including the `all` keyword will disable all rules until the linter sees a matching enable comment:
+
+`// swiftlint:disable all`
+`// swiftlint:enable all`
+
+For example:
+
+```swift
+// swiftlint:disable all
+let noWarning :String = "" // No warning about colons immediately after variable names!
+let i = "" // Also no warning about short identifier names
+// swiftlint:enable all
+let hasWarning :String = "" // Warning generated about colons immediately after variable names
+let y = "" // Warning generated about short identifier names
 ```
 
 It's also possible to modify a `disable` or `enable` command by appending
